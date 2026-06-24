@@ -1,0 +1,326 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// Bloomberg Tracker — Prisma Schema (PostgreSQL 18 EDB, port 5432)
+// ─────────────────────────────────────────────────────────────────────────────
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Users ────────────────────────────────────────────────────────────────────
+model User {
+  id              String      @id @default(uuid())
+  email           String      @unique
+  displayName     String
+  passwordHash    String?
+  theme           String      @default("dark")
+  currency        String      @default("USD")
+  timezone        String      @default("UTC")
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  portfolios      Portfolio[]
+  watchlists      Watchlist[]
+  alerts          PriceAlert[]
+  preferences     UserPreference?
+
+  @@index([email])
+}
+
+model UserPreference {
+  id                    String    @id @default(uuid())
+  userId                String    @unique
+  defaultChartInterval  String    @default("D")
+  defaultChartType      String    @default("candlestick")
+  showPremarket         Boolean   @default(true)
+  showAftermarket       Boolean   @default(true)
+  tickerScrollSpeed     Int       @default(30)
+  decimalPlaces         Int       @default(2)
+  notificationsEnabled  Boolean   @default(true)
+  emailAlerts           Boolean   @default(false)
+  soundAlerts           Boolean   @default(true)
+  compactMode           Boolean   @default(false)
+  updatedAt             DateTime  @updatedAt
+
+  user    User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ─── Portfolio ─────────────────────────────────────────────────────────────────
+model Portfolio {
+  id            String              @id @default(uuid())
+  userId        String
+  name          String
+  description   String?
+  currency      String              @default("USD")
+  isDefault     Boolean             @default(false)
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+
+  user          User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  positions     PortfolioPosition[]
+  transactions  Transaction[]
+  snapshots     PortfolioSnapshot[]
+
+  @@index([userId])
+}
+
+model PortfolioPosition {
+  id              String        @id @default(uuid())
+  portfolioId     String
+  symbol          String
+  assetType       AssetType
+  shares          Decimal       @db.Decimal(18, 8)
+  avgCostBasis    Decimal       @db.Decimal(18, 8)
+  currentPrice    Decimal?      @db.Decimal(18, 8)
+  totalValue      Decimal?      @db.Decimal(18, 8)
+  unrealizedPnL   Decimal?      @db.Decimal(18, 8)
+  realizedPnL     Decimal       @default(0) @db.Decimal(18, 8)
+  dayGain         Decimal?      @db.Decimal(18, 8)
+  dayGainPct      Decimal?      @db.Decimal(10, 4)
+  weight          Decimal?      @db.Decimal(10, 4)
+  sector          String?
+  industry        String?
+  openedAt        DateTime
+  lastUpdated     DateTime      @default(now())
+
+  portfolio       Portfolio     @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+  transactions    Transaction[]
+
+  @@unique([portfolioId, symbol])
+  @@index([portfolioId])
+  @@index([symbol])
+}
+
+model Transaction {
+  id              String            @id @default(uuid())
+  portfolioId     String
+  positionId      String?
+  symbol          String
+  assetType       AssetType
+  type            TransactionType
+  shares          Decimal           @db.Decimal(18, 8)
+  price           Decimal           @db.Decimal(18, 8)
+  totalAmount     Decimal           @db.Decimal(18, 8)
+  fees            Decimal           @default(0) @db.Decimal(18, 8)
+  currency        String            @default("USD")
+  notes           String?
+  executedAt      DateTime
+  createdAt       DateTime          @default(now())
+
+  portfolio       Portfolio         @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+  position        PortfolioPosition? @relation(fields: [positionId], references: [id])
+
+  @@index([portfolioId])
+  @@index([symbol])
+  @@index([executedAt])
+}
+
+model PortfolioSnapshot {
+  id            String    @id @default(uuid())
+  portfolioId   String
+  totalValue    Decimal   @db.Decimal(18, 8)
+  totalCost     Decimal   @db.Decimal(18, 8)
+  totalPnL      Decimal   @db.Decimal(18, 8)
+  totalPnLPct   Decimal   @db.Decimal(10, 4)
+  dayChange     Decimal   @db.Decimal(18, 8)
+  dayChangePct  Decimal   @db.Decimal(10, 4)
+  snapshotDate  DateTime
+  createdAt     DateTime  @default(now())
+
+  portfolio     Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+
+  @@index([portfolioId, snapshotDate])
+}
+
+// ─── Watchlist ─────────────────────────────────────────────────────────────────
+model Watchlist {
+  id          String          @id @default(uuid())
+  userId      String
+  name        String
+  description String?
+  isDefault   Boolean         @default(false)
+  sortOrder   Int             @default(0)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  symbols     WatchlistItem[]
+
+  @@index([userId])
+}
+
+model WatchlistItem {
+  id          String    @id @default(uuid())
+  watchlistId String
+  symbol      String
+  assetType   AssetType
+  displayName String?
+  notes       String?
+  addedAt     DateTime  @default(now())
+  sortOrder   Int       @default(0)
+
+  watchlist   Watchlist @relation(fields: [watchlistId], references: [id], onDelete: Cascade)
+
+  @@unique([watchlistId, symbol])
+  @@index([watchlistId])
+}
+
+// ─── Price Alerts ─────────────────────────────────────────────────────────────
+model PriceAlert {
+  id              String        @id @default(uuid())
+  userId          String
+  symbol          String
+  assetType       AssetType
+  alertType       AlertType
+  condition       AlertCondition
+  targetPrice     Decimal       @db.Decimal(18, 8)
+  currentPrice    Decimal?      @db.Decimal(18, 8)
+  percentChange   Decimal?      @db.Decimal(10, 4)
+  message         String?
+  isActive        Boolean       @default(true)
+  isTriggered     Boolean       @default(false)
+  triggeredAt     DateTime?
+  expiresAt       DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([symbol, isActive])
+}
+
+// ─── Market Data Cache ────────────────────────────────────────────────────────
+model StockQuote {
+  symbol          String    @id
+  companyName     String?
+  price           Decimal   @db.Decimal(18, 8)
+  change          Decimal   @db.Decimal(18, 8)
+  changePercent   Decimal   @db.Decimal(10, 4)
+  open            Decimal   @db.Decimal(18, 8)
+  high            Decimal   @db.Decimal(18, 8)
+  low             Decimal   @db.Decimal(18, 8)
+  previousClose   Decimal   @db.Decimal(18, 8)
+  volume          BigInt
+  avgVolume       BigInt?
+  marketCap       Decimal?  @db.Decimal(24, 2)
+  peRatio         Decimal?  @db.Decimal(10, 4)
+  eps             Decimal?  @db.Decimal(10, 4)
+  beta            Decimal?  @db.Decimal(8, 4)
+  weekHigh52      Decimal?  @db.Decimal(18, 8)
+  weekLow52       Decimal?  @db.Decimal(18, 8)
+  exchange        String?
+  currency        String    @default("USD")
+  sector          String?
+  industry        String?
+  source          String    @default("finnhub")
+  updatedAt       DateTime  @updatedAt
+
+  @@index([sector])
+}
+
+model OHLCVCandle {
+  id          String    @id @default(uuid())
+  symbol      String
+  assetType   AssetType
+  interval    String
+  time        DateTime
+  open        Decimal   @db.Decimal(18, 8)
+  high        Decimal   @db.Decimal(18, 8)
+  low         Decimal   @db.Decimal(18, 8)
+  close       Decimal   @db.Decimal(18, 8)
+  volume      Decimal   @db.Decimal(24, 2)
+
+  @@unique([symbol, interval, time])
+  @@index([symbol, interval, time])
+}
+
+model TechnicalIndicator {
+  id          String    @id @default(uuid())
+  symbol      String
+  interval    String
+  indicator   String    // RSI, MACD, BB, EMA, SMA, etc.
+  time        DateTime
+  values      Json
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([symbol, interval, indicator, time])
+  @@index([symbol, interval, indicator])
+}
+
+// ─── News & Sentiment ────────────────────────────────────────────────────────
+model NewsArticle {
+  id              String    @id @default(uuid())
+  externalId      String?   @unique
+  headline        String
+  summary         String?
+  url             String
+  source          String
+  category        String?
+  sentiment       String?   // positive, negative, neutral
+  sentimentScore  Decimal?  @db.Decimal(5, 4)
+  image           String?
+  relatedSymbols  String[]
+  publishedAt     DateTime
+  createdAt       DateTime  @default(now())
+
+  @@index([publishedAt])
+  @@index([relatedSymbols])
+}
+
+// ─── Economic Calendar ───────────────────────────────────────────────────────
+model EconomicEvent {
+  id            String    @id @default(uuid())
+  country       String
+  currency      String
+  title         String
+  description   String?
+  impact        String    // high, medium, low
+  actual        String?
+  forecast      String?
+  previous      String?
+  scheduledAt   DateTime
+  createdAt     DateTime  @default(now())
+
+  @@index([scheduledAt])
+  @@index([country])
+}
+
+// ─── Enums ───────────────────────────────────────────────────────────────────
+enum AssetType {
+  STOCK
+  CRYPTO
+  ETF
+  FOREX
+  COMMODITY
+  INDEX
+}
+
+enum TransactionType {
+  BUY
+  SELL
+  DIVIDEND
+  SPLIT
+  TRANSFER_IN
+  TRANSFER_OUT
+}
+
+enum AlertType {
+  PRICE
+  PERCENT_CHANGE
+  VOLUME
+  MOVING_AVERAGE_CROSS
+}
+
+enum AlertCondition {
+  ABOVE
+  BELOW
+  CROSSES_UP
+  CROSSES_DOWN
+  PERCENT_UP
+  PERCENT_DOWN
+}

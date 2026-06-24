@@ -1,0 +1,223 @@
+<div class="dash">
+
+  <!-- ══ MARKET BANNER ═══════════════════════════════════════════════════════ -->
+  <div class="dash-banner">
+    @for (idx of indicesTape().slice(0,8); track idx.symbol) {
+      <div class="dash-banner__item" (click)="navigate(idx.symbol)">
+        <span class="dash-banner__sym">{{ idx.symbol }}</span>
+        <span class="dash-banner__price mono">{{ idx.price | number:'1.2-2' }}</span>
+        <span class="mono" [class.gain]="idx.changePercent>0" [class.loss]="idx.changePercent<0">
+          {{ idx.changePercent>0?'+':'' }}{{ idx.changePercent | number:'1.2-2' }}%
+        </span>
+      </div>
+    }
+    @if (global()) {
+      <div class="dash-banner__divider"></div>
+      <div class="dash-banner__item">
+        <span class="dash-banner__sym">CRYPTO</span>
+        <span class="dash-banner__price mono">{{ fmtMcap(global()!.totalMarketCap) }}</span>
+        <span class="mono" [class.gain]="global()!.marketCapChange24h>0" [class.loss]="global()!.marketCapChange24h<0">
+          {{ global()!.marketCapChange24h>0?'+':'' }}{{ global()!.marketCapChange24h | number:'1.1-1' }}%
+        </span>
+      </div>
+      <div class="dash-banner__item">
+        <span class="dash-banner__sym">BTC.D</span>
+        <span class="dash-banner__price mono accent">{{ global()!.btcDominance | number:'1.1-1' }}%</span>
+      </div>
+    }
+  </div>
+
+  <!-- ══ MAIN GRID ═══════════════════════════════════════════════════════════ -->
+  <div class="dash-grid">
+
+    <!-- ── MOVERS ────────────────────────────────────────────────────────── -->
+    <div class="bb-panel dash-panel dash-panel--movers">
+      <div class="bb-panel__header">
+        <span class="title">MARKET MOVERS</span>
+        <div class="mover-tabs">
+          @for (t of ['GAINERS','LOSERS','ACTIVE']; track t) {
+            <span class="mover-tab" [class.active]="moversTab===t" (click)="moversTab=t">{{ t }}</span>
+          }
+        </div>
+      </div>
+      <div class="bb-panel__body" style="padding:0;overflow:auto">
+        <table class="bb-table">
+          <thead><tr>
+            <th style="text-align:left">Symbol</th><th>Price</th><th>Chg %</th>
+            <th class="hide-sm">Vol</th><th class="hide-sm">MCap</th>
+          </tr></thead>
+          <tbody>
+            @for (s of currentMovers(); track s.symbol) {
+              <tr [routerLink]="['/chart', s.symbol]">
+                <td style="text-align:left">
+                  <div class="mono accent" style="font-weight:700;font-size:11px">{{ s.symbol }}</div>
+                  <div style="font-size:9px;color:#4a5e7a;overflow:hidden;text-overflow:ellipsis;max-width:90px;white-space:nowrap">{{ s.companyName }}</div>
+                </td>
+                <td class="mono">{{ '$' + (s.price | number:'1.2-2') }}</td>
+                <td><span class="mono" [class.gain]="s.changePercent>0" [class.loss]="s.changePercent<0">
+                  {{ s.changePercent>0?'+':'' }}{{ s.changePercent | number:'1.2-2' }}%
+                </span></td>
+                <td class="mono hide-sm" style="font-size:10px">{{ fmtVol(s.volume) }}</td>
+                <td class="mono hide-sm" style="font-size:10px">{{ s.marketCap?fmtMcap(s.marketCap):'—' }}</td>
+              </tr>
+            }
+            @if (currentMovers().length===0) {
+              <tr><td colspan="5" style="text-align:center;color:#4a5e7a;padding:20px;font-size:11px">Loading...</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── CRYPTO TOP 20 ──────────────────────────────────────────────────── -->
+    <div class="bb-panel dash-panel dash-panel--crypto">
+      <div class="bb-panel__header">
+        <span class="title">CRYPTO MARKETS</span>
+        <a routerLink="/crypto" style="font-size:9px;color:#ff9500;text-decoration:none">ALL →</a>
+      </div>
+      <div class="bb-panel__body" style="padding:0;overflow:auto">
+        <table class="bb-table">
+          <thead><tr>
+            <th style="width:22px">#</th>
+            <th style="text-align:left">Asset</th>
+            <th>Price</th><th>24h %</th>
+            <th class="hide-sm">7d %</th>
+            <th class="hide-sm">MCap</th>
+          </tr></thead>
+          <tbody>
+            @for (c of cryptoMarkets().slice(0,15); track c.id) {
+              <tr [routerLink]="['/crypto']">
+                <td style="color:#4a5e7a;font-size:9px">{{ c.marketCapRank }}</td>
+                <td style="text-align:left">
+                  <div style="display:flex;align-items:center;gap:7px">
+                    @if (c.image) {
+                      <img [src]="c.image" width="16" height="16" style="border-radius:50%;flex-shrink:0" onerror="this.style.display='none'" />
+                    }
+                    <div>
+                      <div class="mono accent" style="font-weight:700;font-size:11px">{{ c.symbol }}</div>
+                      <div style="font-size:8px;color:#4a5e7a">{{ c.name }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="mono" style="font-size:11px">{{ '$' + (fmtCryptoPrice(c.currentPrice)) }}</td>
+                <td class="mono" [class.gain]="c.priceChangePct24h>0" [class.loss]="c.priceChangePct24h<0">
+                  {{ c.priceChangePct24h>0?'+':'' }}{{ c.priceChangePct24h | number:'1.2-2' }}%
+                </td>
+                <td class="mono hide-sm" [class.gain]="(c.priceChangePct7d??0)>0" [class.loss]="(c.priceChangePct7d??0)<0">
+                  {{ c.priceChangePct7d!=null?((c.priceChangePct7d>0?'+':'')+(c.priceChangePct7d|number:'1.2-2')+'%'):'—' }}
+                </td>
+                <td class="mono hide-sm" style="font-size:10px">{{ fmtMcap(c.marketCap) }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── HEATMAP ────────────────────────────────────────────────────────── -->
+    <div class="bb-panel dash-panel dash-panel--heatmap">
+      <div class="bb-panel__header">
+        <span class="title">S&amp;P 500 HEATMAP</span>
+        <div class="heatmap-legend">
+          <span class="loss" style="font-size:9px">–3%</span>
+          <div class="heatmap-legend-bar"></div>
+          <span class="gain" style="font-size:9px">+3%</span>
+        </div>
+      </div>
+      <div class="heatmap-body">
+        @for (cell of heatmapData().slice(0,48); track cell.symbol) {
+          <div class="heatmap-cell"
+            [style.background]="heatColor(cell.changePct)"
+            [style.flex-basis.%]="cellWidth(cell.weight)"
+            [routerLink]="['/chart', cell.symbol]"
+            [title]="cell.symbol+': '+(cell.changePct|number:'1.2-2')+'%'">
+            <span class="heatmap-sym">{{ cell.symbol }}</span>
+            <span class="heatmap-pct mono">{{ cell.changePct>0?'+':'' }}{{ cell.changePct|number:'1.1-1' }}%</span>
+          </div>
+        }
+        @if (heatmapData().length===0) {
+          <div style="width:100%;display:flex;align-items:center;justify-content:center;height:100px;color:#4a5e7a;font-size:11px">Loading heatmap...</div>
+        }
+      </div>
+    </div>
+
+    <!-- ── NEWS ──────────────────────────────────────────────────────────── -->
+    <div class="bb-panel dash-panel dash-panel--news">
+      <div class="bb-panel__header">
+        <span class="title">MARKET INTELLIGENCE</span>
+        <a routerLink="/news" style="font-size:9px;color:#ff9500;text-decoration:none">ALL →</a>
+      </div>
+      <div class="bb-panel__body" style="padding:0;overflow-y:auto">
+        @for (n of news(); track n.datetime) {
+          <a class="dash-news-item" [href]="n.url" target="_blank" rel="noopener">
+            <div class="dash-news-meta">
+              <span class="dash-news-src">{{ n.source }}</span>
+              <span class="dash-news-cat">{{ (n.category||'')| uppercase }}</span>
+              <span class="dash-news-time">{{ fmtTime(n.datetime) }}</span>
+            </div>
+            <div class="dash-news-hl">{{ n.headline }}</div>
+          </a>
+        }
+        @if (news().length===0) {
+          <div style="padding:20px;text-align:center;color:#4a5e7a;font-size:11px">Loading news...</div>
+        }
+      </div>
+    </div>
+
+    <!-- ── SECTORS ────────────────────────────────────────────────────────── -->
+    <div class="bb-panel dash-panel dash-panel--sectors">
+      <div class="bb-panel__header"><span class="title">SECTOR PERFORMANCE</span></div>
+      <div class="bb-panel__body" style="padding:6px 0">
+        @for (sec of sectors(); track sec.sector) {
+          <div class="sector-row">
+            <span class="sector-name">{{ (sec.sector||'—')|slice:0:18 }}</span>
+            <div class="sector-bar-wrap">
+              <div class="sector-bar"
+                [style.width.%]="Math.min(Math.abs(sec.avgChange??0)*18,100)"
+                [class.gain-bar]="(sec.avgChange??0)>0"
+                [class.loss-bar]="(sec.avgChange??0)<0">
+              </div>
+            </div>
+            <span class="sector-pct mono" [class.gain]="(sec.avgChange??0)>0" [class.loss]="(sec.avgChange??0)<0">
+              {{ (sec.avgChange??0)>0?'+':'' }}{{ sec.avgChange|number:'1.2-2' }}%
+            </span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- ── DOMINANCE ──────────────────────────────────────────────────────── -->
+    <div class="bb-panel dash-panel dash-panel--dominance">
+      <div class="bb-panel__header"><span class="title">CRYPTO DOMINANCE</span></div>
+      <div class="bb-panel__body" style="display:flex;flex-direction:column;align-items:center;padding:12px 8px">
+        @if (global()) {
+          <svg viewBox="0 0 120 120" width="110" height="110">
+            <circle cx="60" cy="60" r="50" fill="none" stroke="#1a2840" stroke-width="20"/>
+            <circle cx="60" cy="60" r="50" fill="none" stroke="#ff9500" stroke-width="20"
+              [attr.stroke-dasharray]="btcArc()+' '+(314-btcArc())"
+              stroke-dashoffset="78.5" transform="rotate(-90 60 60)"/>
+            <circle cx="60" cy="60" r="50" fill="none" stroke="#3b82f6" stroke-width="20"
+              [attr.stroke-dasharray]="ethArc()+' '+(314-ethArc())"
+              [attr.stroke-dashoffset]="78.5-btcArc()"
+              transform="rotate(-90 60 60)"/>
+            <text x="60" y="57" text-anchor="middle" fill="#8da0bc" font-size="9" font-family="sans-serif">MCAP</text>
+            <text x="60" y="70" text-anchor="middle" fill="#ff9500" font-size="10" font-weight="700" font-family="monospace">{{ fmtMcap(global()!.totalMarketCap) }}</text>
+          </svg>
+          <div class="dom-legend">
+            <div class="dom-item"><span class="dom-dot" style="background:#ff9500"></span>BTC<span class="mono accent">{{ global()!.btcDominance|number:'1.1-1' }}%</span></div>
+            <div class="dom-item"><span class="dom-dot" style="background:#3b82f6"></span>ETH<span class="mono" style="color:#3b82f6">{{ global()!.ethDominance|number:'1.1-1' }}%</span></div>
+            <div class="dom-item"><span class="dom-dot" style="background:#4a5e7a"></span>ALT<span class="mono" style="color:#8da0bc">{{ (100-global()!.btcDominance-global()!.ethDominance)|number:'1.1-1' }}%</span></div>
+          </div>
+          <div class="dom-stats">
+            <div class="dom-stat"><span>24h Vol</span><span class="mono">{{ fmtMcap(global()!.totalVolume) }}</span></div>
+            <div class="dom-stat"><span>Coins</span><span class="mono">{{ global()!.activeCryptocurrencies|number }}</span></div>
+            <div class="dom-stat"><span>DeFi</span><span class="mono">{{ fmtMcap(global()!.defiVolume) }}</span></div>
+          </div>
+        } @else {
+          <div style="color:#4a5e7a;font-size:11px;padding:20px">Loading...</div>
+        }
+      </div>
+    </div>
+
+  </div>
+</div>

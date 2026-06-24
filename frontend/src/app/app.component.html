@@ -1,0 +1,146 @@
+<div class="bb-shell">
+
+  <!-- ═══ TOP BAR ══════════════════════════════════════════════════════════ -->
+  <header class="bb-topbar">
+    <div class="bb-topbar__left">
+      <div class="bb-logo" (click)="navigate('AAPL')">
+        <span class="bb-logo__mark">*</span>
+        <span class="bb-logo__name">BLOOMBERG</span>
+        <span class="bb-logo__sub">TERMINAL</span>
+      </div>
+
+      <nav class="bb-nav">
+        @for (item of navItems; track item.path) {
+          <a [routerLink]="item.path" routerLinkActive="active" class="bb-nav__item">
+            <span class="bb-nav__icon">{{ item.icon }}</span>
+            <span class="bb-nav__label">{{ item.label }}</span>
+          </a>
+        }
+      </nav>
+    </div>
+
+    <div class="bb-topbar__center">
+      <div class="bb-search" [class.open]="searchOpen">
+        <span class="bb-search__icon">S</span>
+        <input
+          class="bb-search__input"
+          type="text"
+          placeholder="Search symbol, company..."
+          [(ngModel)]="searchTerm"
+          (input)="onSearch($event)"
+          (focus)="searchOpen = true"
+          (blur)="onSearchBlur()"
+          (keydown.escape)="closeSearch()"
+          autocomplete="off"
+        />
+        @if (searchOpen && searchResults().length > 0) {
+          <div class="bb-search__results">
+            @for (r of searchResults(); track r.symbol) {
+              <div class="bb-search__result" (mousedown)="selectSymbol(r)">
+                <span class="bb-search__sym">{{ r.symbol }}</span>
+                <span class="bb-search__desc">{{ r.description }}</span>
+                <span class="bb-search__type">{{ r.type }}</span>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="bb-topbar__right">
+      <div class="bb-market-status">
+        <div class="bb-ws-dot" [class.connected]="wsConnected()"></div>
+        <span [class.gain]="marketStatus().isOpen" [class.flat]="!marketStatus().isOpen">
+          {{ marketStatus().isOpen ? 'MARKET OPEN' : 'MARKET CLOSED' }}
+        </span>
+      </div>
+
+      @if (wsConnected()) {
+        <div class="bb-latency mono">{{ wsLatency() }}ms</div>
+      }
+
+      <div class="bb-clock mono">{{ serverTime() | date:'HH:mm:ss' }} ET</div>
+
+      <button class="bb-icon-btn bb-notif-btn" (click)="showNotifications = !showNotifications">
+        B
+        @if (unreadNotifications() > 0) {
+          <span class="bb-notif-badge">{{ unreadNotifications() }}</span>
+        }
+      </button>
+    </div>
+  </header>
+
+  <!-- ═══ TICKER TAPE ══════════════════════════════════════════════════════ -->
+  <div class="bb-ticker">
+    <div class="bb-ticker__track">
+      @for (q of tapeData(); track q.symbol) {
+        <span class="bb-ticker__item" (click)="navigate(q.symbol)">
+          <span class="bb-ticker__sym">{{ q.symbol }}</span>
+          <span class="bb-ticker__price mono">{{ q.price | number:'1.2-2' }}</span>
+          <span class="bb-ticker__chg mono" [class.gain]="q.changePercent > 0" [class.loss]="q.changePercent < 0">
+            {{ q.changePercent > 0 ? '+' : '' }}{{ q.changePercent | number:'1.2-2' }}%
+          </span>
+        </span>
+      }
+      @for (q of tapeData(); track q.symbol + '_d') {
+        <span class="bb-ticker__item" (click)="navigate(q.symbol)">
+          <span class="bb-ticker__sym">{{ q.symbol }}</span>
+          <span class="bb-ticker__price mono">{{ q.price | number:'1.2-2' }}</span>
+          <span class="bb-ticker__chg mono" [class.gain]="q.changePercent > 0" [class.loss]="q.changePercent < 0">
+            {{ q.changePercent > 0 ? '+' : '' }}{{ q.changePercent | number:'1.2-2' }}%
+          </span>
+        </span>
+      }
+    </div>
+  </div>
+
+  <!-- ═══ BODY ══════════════════════════════════════════════════════════════ -->
+  <div class="bb-body">
+
+    <!-- SIDEBAR -->
+    <aside class="bb-sidebar" [class.collapsed]="!sidebarOpen()">
+      <button class="bb-sidebar__toggle" (click)="toggleSidebar()">
+        {{ sidebarOpen() ? '<' : '>' }}
+      </button>
+
+      @if (sidebarOpen()) {
+        @if (portfolioValue()) {
+          <div class="bb-sidebar__portfolio">
+            <div class="bb-sidebar__section-title">PORTFOLIO</div>
+            <div class="bb-sidebar__pval mono">{{ '$' + (portfolioValue()!.totalValue | number:'1.2-2') }}</div>
+            <div class="bb-sidebar__pchg mono"
+              [class.gain]="portfolioValue()!.dayChangePct > 0"
+              [class.loss]="portfolioValue()!.dayChangePct < 0">
+              {{ portfolioValue()!.dayChangePct > 0 ? '+' : '' }}{{ portfolioValue()!.dayChangePct | number:'1.2-2' }}% today
+            </div>
+          </div>
+        }
+
+        <div class="bb-sidebar__section-title">MARKETS</div>
+        @for (sym of quickSymbols; track sym) {
+          <div class="bb-sidebar__sym" [class.active]="activeSymbol() === sym"
+            (click)="navigate(sym)">
+            {{ sym }}
+          </div>
+        }
+      }
+    </aside>
+
+    <!-- MAIN -->
+    <main class="bb-main">
+      <router-outlet />
+    </main>
+
+  </div>
+
+  <!-- ═══ TOASTS ════════════════════════════════════════════════════════════ -->
+  <div class="bb-toast-container">
+    @for (n of notifications(); track n.id) {
+      <div class="bb-toast" [class]="'bb-toast--' + n.type">
+        <div class="bb-toast__msg">{{ n.message }}</div>
+        <button class="bb-toast__close" (click)="dismissNotif(n.id)">✕</button>
+      </div>
+    }
+  </div>
+
+</div>

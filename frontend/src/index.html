@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Bloomberg Tracker</title>
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#060a14">
+  <meta name="description" content="Professional Bloomberg-style Stock & Crypto Tracker — Real-time markets, portfolio management, advanced charting">
+
+  <!-- Preconnect for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23060a14'/><text x='4' y='24' font-size='22' fill='%23ff9500'>◆</text></svg>">
+
+  <style>
+    /* Critical CSS — prevent FOUC */
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: #060a14;
+      color: #d4e0f5;
+      font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      overflow: hidden;
+    }
+
+    /* Splash screen */
+    #bb-splash {
+      position: fixed;
+      inset: 0;
+      background: #060a14;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+      gap: 24px;
+      transition: opacity 0.4s ease;
+    }
+
+    #bb-splash.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .bb-splash-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .bb-splash-mark {
+      font-size: 48px;
+      color: #ff9500;
+      animation: pulse 2s infinite;
+    }
+
+    .bb-splash-text { text-align: left; }
+    .bb-splash-name {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: 6px;
+      color: #ff9500;
+    }
+
+    .bb-splash-sub {
+      font-size: 11px;
+      letter-spacing: 4px;
+      color: #4a5e7a;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    .bb-splash-bar {
+      width: 280px;
+      height: 2px;
+      background: #1a2840;
+      border-radius: 1px;
+      overflow: hidden;
+    }
+
+    .bb-splash-progress {
+      height: 100%;
+      background: #ff9500;
+      border-radius: 1px;
+      animation: progress 1.5s ease-out forwards;
+    }
+
+    .bb-splash-status {
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: #4a5e7a;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(0.95); }
+    }
+
+    @keyframes progress {
+      from { width: 0; }
+      to   { width: 100%; }
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    .bb-cursor {
+      display: inline-block;
+      width: 8px;
+      height: 14px;
+      background: #ff9500;
+      animation: blink 0.8s infinite;
+      vertical-align: middle;
+      margin-left: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Splash screen -->
+  <div id="bb-splash">
+    <div class="bb-splash-logo">
+      <span class="bb-splash-mark">◆</span>
+      <div class="bb-splash-text">
+        <div class="bb-splash-name">BLOOMBERG</div>
+        <div class="bb-splash-sub">Terminal · Professional Edition</div>
+      </div>
+    </div>
+    <div class="bb-splash-bar">
+      <div class="bb-splash-progress"></div>
+    </div>
+    <div class="bb-splash-status" id="splashStatus">INITIALIZING<span class="bb-cursor"></span></div>
+  </div>
+
+  <app-root></app-root>
+
+  <script>
+    const statuses = [
+      'CONNECTING TO MARKET DATA',
+      'LOADING PORTFOLIO',
+      'SYNCING WATCHLISTS',
+      'ESTABLISHING WS FEEDS',
+      'READY',
+    ];
+    let i = 0;
+    const el = document.getElementById('splashStatus');
+    const interval = setInterval(() => {
+      if (el && i < statuses.length) {
+        el.textContent = statuses[i] + '...';
+        i++;
+      } else {
+        clearInterval(interval);
+      }
+    }, 300);
+
+    // Hide splash when Angular boots
+    window.__hideSplash = function() {
+      const splash = document.getElementById('bb-splash');
+      if (splash) {
+        splash.classList.add('hidden');
+        setTimeout(() => splash.remove(), 500);
+      }
+    };
+
+    // Fallback: always hide after 3s
+    setTimeout(() => window.__hideSplash && window.__hideSplash(), 3000);
+  </script>
+</body>
+</html>

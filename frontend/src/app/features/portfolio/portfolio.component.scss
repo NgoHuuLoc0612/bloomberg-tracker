@@ -1,0 +1,329 @@
+@use '../../../styles/variables' as *;
+
+.port-shell {
+  display: flex;
+  height:  100%;
+  overflow: hidden;
+}
+
+.port-sidebar {
+  width:         220px;
+  background:    $bg-panel;
+  border-right:  $panel-border;
+  flex-shrink:   0;
+  overflow-y:    auto;
+  @include scrollbar;
+
+  &__header {
+    display:      flex;
+    align-items:  center;
+    justify-content: space-between;
+    padding:      $space-md;
+    border-bottom:$panel-border;
+    font-size:    9px;
+    font-weight:  700;
+    letter-spacing:1.5px;
+    color:        $text-muted;
+    text-transform:uppercase;
+  }
+
+  &__item {
+    padding:      $space-sm $space-md;
+    border-bottom:$panel-border;
+    cursor:       pointer;
+    transition:   background $transition-fast;
+
+    &:hover  { background: $bg-panel-hover; }
+    &.active { background: rgba(255,149,0,0.06); border-left: 2px solid $accent-orange; }
+
+    &-name { font-size: 12px; color: $text-primary; font-weight: 600; }
+    &-meta { font-size: 9px; color: $text-muted; margin-top: 2px; }
+  }
+}
+
+.port-new-form {
+  padding: $space-md;
+  border-bottom: $panel-border;
+  background: $bg-secondary;
+}
+
+.port-main {
+  flex:      1;
+  overflow:  hidden;
+  display:   flex;
+  flex-direction: column;
+}
+
+// ─── Banner ──────────────────────────────────────────────────────────────────
+.port-banner {
+  display:      flex;
+  align-items:  center;
+  gap:          $space-2xl;
+  padding:      $space-md $space-xl;
+  background:   $bg-secondary;
+  border-bottom:$panel-border;
+  flex-shrink:  0;
+
+  &__label {
+    font-size:   8px;
+    font-weight: 700;
+    letter-spacing:1.5px;
+    color:       $text-muted;
+    text-transform:uppercase;
+    margin-bottom:4px;
+  }
+
+  &__value, &__pnlval, &__dayval {
+    font-family: $font-mono;
+    font-size:   20px;
+    font-weight: 600;
+    color:       $text-primary;
+  }
+
+  &__pnlval, &__dayval { font-size: 16px; }
+
+  &__actions {
+    margin-left: auto;
+    display:     flex;
+    gap:         $space-sm;
+  }
+}
+
+// ─── Overview ────────────────────────────────────────────────────────────────
+.port-overview {
+  display:  grid;
+  grid-template-columns: 1fr 500px;
+  flex:     1;
+  overflow: hidden;
+
+  &__chart-wrap {
+    border-right: $panel-border;
+    overflow:     hidden;
+    display:      flex;
+    flex-direction: column;
+  }
+
+  &__breakdown {
+    display:   flex;
+    flex-direction: column;
+    overflow-y:auto;
+    @include scrollbar;
+  }
+}
+
+.port-perf-chart {
+  flex: 1;
+  min-height: 200px;
+}
+
+// ─── Allocation ───────────────────────────────────────────────────────────────
+.alloc-legend {
+  margin-top: $space-md;
+  display:    flex;
+  flex-direction:column;
+  gap:        $space-xs;
+}
+
+.alloc-item {
+  display:    flex;
+  align-items:center;
+  gap:        $space-sm;
+  font-size:  11px;
+}
+
+.alloc-dot {
+  width:        8px;
+  height:       8px;
+  border-radius:50%;
+  flex-shrink:  0;
+}
+
+.alloc-sym { color: $text-secondary; flex: 1; }
+.alloc-pct { color: $accent-orange; }
+
+// ─── Sector Alloc ────────────────────────────────────────────────────────────
+.sector-alloc {
+  display:      flex;
+  align-items:  center;
+  gap:          $space-sm;
+  padding:      4px 0;
+  border-bottom:$panel-border;
+
+  &__bar-wrap {
+    flex:        1;
+    height:      8px;
+    background:  $bg-secondary;
+    border-radius:2px;
+    overflow:    hidden;
+  }
+
+  &__bar {
+    height:      100%;
+    background:  $accent-orange;
+    border-radius:2px;
+    opacity:     0.7;
+    transition:  width 500ms ease;
+  }
+}
+
+// ─── Positions ───────────────────────────────────────────────────────────────
+.port-positions { overflow: auto; @include scrollbar; flex: 1; }
+
+.asset-badge {
+  font-size:  8px;
+  padding:    1px 4px;
+  border-radius:2px;
+  margin-left:4px;
+  font-weight:600;
+  letter-spacing:0.5px;
+
+  &--stock  { background: rgba(59,130,246,0.15); color: #3b82f6; }
+  &--crypto { background: rgba(255,149,0,0.15);  color: $accent-orange; }
+  &--etf    { background: rgba(0,212,255,0.15);  color: $color-cyan; }
+}
+
+.weight-bar {
+  width:        60px;
+  height:       4px;
+  background:   $bg-secondary;
+  border-radius:2px;
+  overflow:     hidden;
+  margin-bottom:2px;
+
+  &__fill {
+    height:     100%;
+    background: $accent-orange;
+    transition: width 300ms ease;
+  }
+}
+
+// ─── Transactions ─────────────────────────────────────────────────────────────
+.port-transactions { overflow: auto; @include scrollbar; flex: 1; }
+
+.trans-filters {
+  display:     flex;
+  gap:         $space-sm;
+  padding:     $space-sm $space-md;
+  border-bottom:$panel-border;
+  flex-shrink: 0;
+}
+
+.tx-badge {
+  font-size:  9px;
+  padding:    2px 6px;
+  border-radius:2px;
+  font-weight:700;
+  letter-spacing:0.5px;
+
+  &--buy      { background: $color-gain-glow;  color: $color-gain;  }
+  &--sell     { background: $color-loss-glow;  color: $color-loss;  }
+  &--dividend { background: rgba(59,130,246,0.15); color: #3b82f6;  }
+}
+
+// ─── Analytics ────────────────────────────────────────────────────────────────
+.analytics-row, .perf-row {
+  display:      flex;
+  align-items:  center;
+  justify-content: space-between;
+  padding:      5px 0;
+  border-bottom:$panel-border;
+  font-size:    11px;
+  color:        $text-secondary;
+}
+
+.perf-row { padding: 6px $space-md; }
+
+// ─── Empty State ──────────────────────────────────────────────────────────────
+.port-empty {
+  display:        flex;
+  flex-direction: column;
+  align-items:    center;
+  justify-content:center;
+  height:         100%;
+  gap:            $space-lg;
+  color:          $text-muted;
+
+  &__icon  { font-size: 64px; opacity: 0.2; }
+  &__title { font-size: 18px; font-weight: 600; color: $text-secondary; }
+  &__sub   { font-size: 13px; }
+}
+
+// ─── Modal ───────────────────────────────────────────────────────────────────
+.modal-overlay {
+  position:   fixed;
+  inset:      0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(4px);
+  z-index:    9000;
+  display:    flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.modal {
+  background:   $bg-secondary;
+  border:       1px solid $border-accent;
+  border-radius:3px;
+  width:        480px;
+  max-height:   90vh;
+  overflow:     hidden;
+  display:      flex;
+  flex-direction:column;
+  box-shadow:   0 20px 60px rgba(0,0,0,0.6);
+
+  &__header {
+    display:      flex;
+    align-items:  center;
+    justify-content:space-between;
+    padding:      $space-md $space-lg;
+    border-bottom:$panel-border;
+    font-size:    11px;
+    font-weight:  700;
+    letter-spacing:1.5px;
+    color:        $accent-orange;
+    text-transform:uppercase;
+  }
+
+  &__body {
+    padding:  $space-lg;
+    overflow-y:auto;
+    @include scrollbar;
+  }
+
+  &__total {
+    margin-top:  $space-md;
+    padding-top: $space-md;
+    border-top:  $panel-border;
+    font-size:   14px;
+    font-weight: 600;
+    text-align:  right;
+  }
+
+  &__footer {
+    display:      flex;
+    justify-content:flex-end;
+    gap:          $space-sm;
+    padding:      $space-md $space-lg;
+    border-top:   $panel-border;
+  }
+}
+
+.form-row {
+  display:      flex;
+  flex-direction:column;
+  gap:          $space-xs;
+  margin-bottom:$space-md;
+
+  label {
+    font-size:   9px;
+    font-weight: 700;
+    letter-spacing:1px;
+    color:       $text-muted;
+    text-transform:uppercase;
+  }
+}
+
+.gain { color: $color-gain; }
+.loss { color: $color-loss; }
+.accent { color: $accent-orange; }
+.mono { font-family: $font-mono; font-feature-settings: 'tnum'; }

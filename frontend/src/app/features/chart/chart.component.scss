@@ -1,0 +1,337 @@
+@use '../../../styles/variables' as *;
+
+.chart-shell {
+  display:        flex;
+  flex-direction: column;
+  height:         100%;
+  overflow:       hidden;
+  background:     $bg-primary;
+}
+
+// ─── Header ──────────────────────────────────────────────────────────────────
+.chart-header {
+  display:        flex;
+  align-items:    center;
+  justify-content:space-between;
+  padding:        0 $space-md;
+  height:         56px;
+  background:     $bg-secondary;
+  border-bottom:  $panel-border;
+  flex-shrink:    0;
+  gap:            $space-xl;
+}
+
+.chart-header__left  { display: flex; align-items: center; gap: $space-xl; flex: 1; }
+.chart-header__right { display: flex; align-items: center; gap: $space-md; flex-shrink: 0; }
+
+.chart-symbol {
+  display:      flex;
+  align-items:  baseline;
+  gap:          $space-sm;
+
+  &__ticker {
+    font-family:   $font-mono;
+    font-size:     20px;
+    font-weight:   700;
+    color:         $accent-orange;
+    letter-spacing:1px;
+  }
+
+  &__name {
+    font-size:  12px;
+    color:      $text-secondary;
+    max-width:  200px;
+    overflow:   hidden;
+    text-overflow: ellipsis;
+    white-space:nowrap;
+  }
+
+  &__exchange {
+    font-size:  9px;
+    padding:    2px 5px;
+  }
+}
+
+.chart-price-block {
+  display:      flex;
+  align-items:  baseline;
+  gap:          $space-md;
+}
+
+.chart-price {
+  font-size:  24px;
+  font-weight:600;
+  color:      $text-primary;
+}
+
+.chart-change {
+  font-size:  14px;
+  font-weight:500;
+}
+
+.chart-session {
+  font-size:    9px;
+  letter-spacing:1.5px;
+  color:        $text-muted;
+  padding:      2px 6px;
+  border:       1px solid $border-primary;
+  border-radius:2px;
+}
+
+.chart-stats {
+  display:      flex;
+  align-items:  center;
+  gap:          $space-lg;
+}
+
+.chart-stat {
+  display:      flex;
+  flex-direction:column;
+  gap:          1px;
+
+  &__lbl {
+    font-size:  8px;
+    font-weight:700;
+    letter-spacing:1px;
+    color:      $text-muted;
+    text-transform:uppercase;
+  }
+
+  &__val {
+    font-size:  11px;
+    color:      $text-primary;
+  }
+}
+
+.chart-live-dot {
+  display:      flex;
+  align-items:  center;
+  gap:          5px;
+  font-size:    9px;
+  letter-spacing:1.5px;
+  color:        $color-gain;
+}
+
+// ─── Toolbar ─────────────────────────────────────────────────────────────────
+.chart-toolbar {
+  display:        flex;
+  align-items:    center;
+  justify-content:space-between;
+  padding:        0 $space-md;
+  height:         32px;
+  background:     $bg-panel;
+  border-bottom:  $panel-border;
+  flex-shrink:    0;
+}
+
+.chart-toolbar__indicators { display: flex; gap: $space-xs; }
+.chart-toolbar__actions    { display: flex; gap: $space-xs; }
+
+.bb-btn.active {
+  background:   $accent-orange-glow;
+  border-color: $accent-orange-dim;
+  color:        $accent-orange;
+}
+
+// ─── Intervals ────────────────────────────────────────────────────────────────
+.chart-intervals {
+  border-bottom: none;
+
+  .bb-tabs__tab {
+    padding:    4px 8px;
+    font-size:  10px;
+    height:     28px;
+    display:    flex;
+    align-items:center;
+  }
+}
+
+.chart-type-btns {
+  display: flex;
+  gap:     3px;
+  padding-left: $space-sm;
+  border-left:  $panel-border;
+}
+
+// ─── Workspace ────────────────────────────────────────────────────────────────
+.chart-workspace {
+  display:        grid;
+  grid-template-columns: 1fr 260px;
+  grid-template-rows:    1fr auto;
+  grid-template-areas:
+    "chart  right"
+    "sub    right";
+  flex:           1;
+  overflow:       hidden;
+  min-height:     0;
+}
+
+.chart-area {
+  grid-area:  chart;
+  position:   relative;
+  overflow:   hidden;
+  min-height: 300px;
+}
+
+.chart-canvas {
+  width:  100%;
+  height: 100%;
+}
+
+.chart-sub {
+  grid-area:      sub;
+  position:       relative;
+  height:         120px;
+  border-top:     $panel-border;
+  overflow:       hidden;
+
+  .chart-canvas { height: 120px; }
+}
+
+.chart-sub__label {
+  position:    absolute;
+  top:         4px;
+  left:        $space-sm;
+  font-size:   9px;
+  font-weight: 700;
+  letter-spacing:1px;
+  color:       $text-muted;
+  pointer-events:none;
+}
+
+// ─── Loading ──────────────────────────────────────────────────────────────────
+.chart-loading {
+  position:    absolute;
+  inset:       0;
+  display:     flex;
+  flex-direction:column;
+  align-items: center;
+  justify-content:center;
+  gap:         $space-md;
+  background:  rgba(6,10,20,0.8);
+  z-index:     10;
+  font-size:   12px;
+  color:       $text-muted;
+}
+
+.chart-loading__spinner {
+  width:        32px;
+  height:       32px;
+  border:       2px solid $border-accent;
+  border-top-color: $accent-orange;
+  border-radius:50%;
+  animation:   spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+// ─── Crosshair Tooltip ───────────────────────────────────────────────────────
+.chart-crosshair {
+  position:    absolute;
+  top:         $space-sm;
+  left:        $space-sm;
+  display:     flex;
+  gap:         $space-md;
+  font-size:   10px;
+  padding:     4px 8px;
+  background:  rgba(13,21,38,0.9);
+  border:      $panel-border;
+  pointer-events:none;
+  z-index:     5;
+}
+
+// ─── Right Panel ─────────────────────────────────────────────────────────────
+.chart-right-panel {
+  grid-area:    right;
+  grid-row:     1 / 3;
+  background:   $bg-panel;
+  border-left:  $panel-border;
+  display:      flex;
+  flex-direction:column;
+  overflow:     hidden;
+}
+
+.chart-info-grid {
+  padding: $space-sm;
+}
+
+.info-row {
+  display:         flex;
+  justify-content: space-between;
+  padding:         5px $space-xs;
+  border-bottom:   1px solid $border-secondary;
+  font-size:       11px;
+
+  span:first-child { color: $text-muted; }
+  span:last-child  { color: $text-primary; }
+}
+
+.chart-peers {
+  padding:    $space-sm;
+  border-top: $panel-border;
+}
+
+.chart-peer {
+  display:       inline-block;
+  padding:       3px 6px;
+  margin:        3px;
+  background:    $bg-secondary;
+  border:        $panel-border;
+  border-radius: 2px;
+  font-family:   $font-mono;
+  font-size:     10px;
+  color:         $accent-orange;
+  cursor:        pointer;
+
+  &:hover { background: $bg-panel-hover; }
+}
+
+.chart-news-list { overflow-y: auto; @include scrollbar; }
+
+.chart-news-item {
+  display:      block;
+  padding:      $space-sm;
+  border-bottom:$panel-border;
+  text-decoration:none;
+  transition:   background $transition-fast;
+
+  &:hover { background: $bg-panel-hover; }
+
+  &__src  { font-size: 9px; color: $accent-orange; letter-spacing: 1px; display: block; }
+  &__head { font-size: 11px; color: $text-primary; line-height: 1.4; margin: 3px 0; display: block; }
+  &__time { font-size: 9px; color: $text-muted; display: block; }
+}
+
+.chart-earnings-list { overflow-y: auto; @include scrollbar; }
+
+// ─── Recommendations ─────────────────────────────────────────────────────────
+.chart-rec {
+  padding: $space-sm;
+  border-bottom: $panel-border;
+
+  &__period { font-size: 9px; color: $text-muted; letter-spacing: 1px; margin-bottom: 5px; }
+  &__bars   { display: flex; height: 20px; border-radius: 2px; overflow: hidden; }
+  &__bar    {
+    display:     flex;
+    align-items: center;
+    justify-content:center;
+    font-size:   9px;
+    font-weight: 700;
+    color:       rgba(0,0,0,0.7);
+    transition:  width 500ms ease;
+    overflow:    hidden;
+    white-space: nowrap;
+
+    &--buy  { background: $color-gain; }
+    &--hold { background: $color-flat; }
+    &--sell { background: $color-loss; }
+  }
+}
+
+.panel-section-title {
+  font-size:    9px;
+  font-weight:  700;
+  letter-spacing:1.5px;
+  color:        $text-muted;
+  text-transform:uppercase;
+  padding:      $space-sm $space-xs $space-xs;
+}

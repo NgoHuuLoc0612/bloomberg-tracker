@@ -1,0 +1,228 @@
+@use '../styles/variables' as *;
+
+.bb-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  background: $bg-primary;
+}
+
+/* ─── Top Bar ──────────────────────────────────────────────────────────────── */
+.bb-topbar {
+  display: flex;
+  align-items: center;
+  height: $topbar-height;
+  background: $bg-secondary;
+  border-bottom: $panel-border;
+  padding: 0 $space-md;
+  gap: $space-lg;
+  flex-shrink: 0;
+  z-index: 1000;
+}
+
+.bb-topbar__left   { display: flex; align-items: center; gap: $space-lg; }
+.bb-topbar__center { flex: 1; max-width: 400px; margin: 0 auto; }
+.bb-topbar__right  { display: flex; align-items: center; gap: $space-md; margin-left: auto; }
+
+.bb-logo {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  cursor: pointer;
+  user-select: none;
+
+  &__mark { color: $accent-orange; font-size: 14px; }
+  &__name { color: $accent-orange; font-weight: 700; font-size: 13px; letter-spacing: 2px; }
+  &__sub  { color: $text-muted; font-size: 9px; letter-spacing: 2px; margin-left: 4px; }
+}
+
+.bb-nav { display: flex; }
+.bb-nav__item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 10px;
+  height: $topbar-height;
+  color: $text-secondary;
+  text-decoration: none;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border-bottom: 2px solid transparent;
+  transition: all $transition-fast;
+
+  &:hover { color: $text-primary; }
+  &.active { color: $accent-orange; border-bottom-color: $accent-orange; }
+}
+.bb-nav__icon  { font-size: 12px; }
+.bb-nav__label { display: none; @media (min-width: 1400px) { display: inline; } }
+
+/* ─── Search ──────────────────────────────────────────────────────────────── */
+.bb-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: $bg-input;
+  border: 1px solid $border-primary;
+  border-radius: 2px;
+  padding: 0 $space-sm;
+  height: 26px;
+  transition: border-color $transition-fast;
+
+  &.open, &:focus-within { border-color: $accent-orange; }
+  &__icon  { color: $text-muted; font-size: 14px; }
+  &__input {
+    background: none; border: none; outline: none;
+    color: $text-primary; font-size: 11px; @include mono-data;
+    width: 240px; padding-left: 6px;
+    &::placeholder { color: $text-muted; }
+  }
+  &__results {
+    position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+    background: $bg-secondary; border: 1px solid $border-accent;
+    border-radius: 2px; z-index: 9999; max-height: 260px; overflow-y: auto;
+    @include scrollbar;
+  }
+  &__result {
+    display: flex; align-items: center; padding: 6px 10px; gap: $space-sm;
+    cursor: pointer; transition: background $transition-fast;
+    &:hover { background: $bg-panel-hover; }
+  }
+  &__sym   { color: $accent-orange; @include mono-data; font-size: 11px; font-weight: 700; min-width: 60px; }
+  &__desc  { color: $text-secondary; font-size: 11px; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  &__type  { color: $text-muted; font-size: 9px; letter-spacing: 1px; text-transform: uppercase; }
+}
+
+/* ─── Status indicators ───────────────────────────────────────────────────── */
+.bb-market-status { display: flex; align-items: center; gap: 5px; font-size: 10px; letter-spacing: 1px; }
+.bb-ws-dot {
+  width: 6px; height: 6px; border-radius: 50%; background: $color-flat;
+  &.connected { background: $color-gain; animation: pulse 2s infinite; }
+}
+@keyframes pulse { 0%,100%{transform:scale(1)}50%{transform:scale(1.4)} }
+
+.bb-latency { font-size: 9px; color: $text-muted; @include mono-data; }
+.bb-clock   { font-size: 11px; color: $text-secondary; @include mono-data; }
+
+.bb-icon-btn {
+  background: none; border: 1px solid $border-primary; border-radius: 2px;
+  color: $text-secondary; cursor: pointer; padding: 3px 6px; font-size: 13px;
+  transition: all $transition-fast; position: relative;
+  &:hover { border-color: $accent-orange-dim; color: $accent-orange; }
+}
+
+.bb-notif-btn   { position: relative; }
+.bb-notif-badge {
+  position: absolute; top: -4px; right: -4px;
+  background: $accent-orange; color: #000; border-radius: 8px;
+  font-size: 8px; font-weight: 700; padding: 1px 4px; line-height: 1.2;
+}
+
+/* ─── Ticker Tape ─────────────────────────────────────────────────────────── */
+.bb-ticker {
+  height: $ticker-height;
+  background: $bg-panel;
+  border-bottom: $panel-border;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.bb-ticker__track {
+  display: flex;
+  width: max-content;
+  animation: ticker-scroll 80s linear infinite;
+  height: 100%;
+  align-items: center;
+  &:hover { animation-play-state: paused; }
+}
+@keyframes ticker-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.bb-ticker__item {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 0 $space-lg; border-right: $panel-border;
+  cursor: pointer; height: 100%; transition: background $transition-fast;
+  &:hover { background: $bg-panel-hover; }
+}
+.bb-ticker__sym   { @include mono-data; font-size: 10px; font-weight: 700; color: $accent-orange; letter-spacing: 0.5px; }
+.bb-ticker__price { @include mono-data; font-size: 10px; color: $text-primary; }
+.bb-ticker__chg   { @include mono-data; font-size: 10px; }
+
+/* ─── Body ────────────────────────────────────────────────────────────────── */
+.bb-body { display: flex; flex: 1; overflow: hidden; }
+
+/* ─── Sidebar ─────────────────────────────────────────────────────────────── */
+.bb-sidebar {
+  width: 200px; background: $bg-secondary; border-right: $panel-border;
+  flex-shrink: 0; overflow-y: auto; transition: width $transition-normal;
+  position: relative; @include scrollbar;
+  &.collapsed { width: 40px; overflow: hidden; }
+}
+.bb-sidebar__toggle {
+  position: absolute; top: $space-sm; right: 5px;
+  background: none; border: 1px solid $border-primary; border-radius: 2px;
+  color: $text-muted; cursor: pointer; padding: 2px 5px; font-size: 10px;
+  transition: all $transition-fast; z-index: 1;
+  &:hover { color: $accent-orange; border-color: $accent-orange-dim; }
+}
+.bb-sidebar__portfolio {
+  padding: $space-sm $space-md; border-bottom: $panel-border;
+  margin-top: 28px;
+}
+.bb-sidebar__pval { @include mono-data; color: $text-primary; font-size: 15px; font-weight: 600; }
+.bb-sidebar__pchg { @include mono-data; font-size: 11px; margin-top: 2px; }
+.bb-sidebar__section-title {
+  padding: $space-sm $space-md $space-xs;
+  font-size: 9px; font-weight: 700; letter-spacing: 1.5px;
+  color: $text-muted; text-transform: uppercase;
+}
+.bb-sidebar__sym {
+  padding: 6px $space-md;
+  @include mono-data; font-size: 11px; color: $text-secondary;
+  cursor: pointer; border-left: 2px solid transparent; transition: all $transition-fast;
+  &:hover { color: $text-primary; background: $bg-panel-hover; }
+  &.active { color: $accent-orange; border-left-color: $accent-orange; }
+}
+
+/* ─── Main ────────────────────────────────────────────────────────────────── */
+.bb-main { flex: 1; overflow: auto; background: $bg-primary; @include scrollbar; }
+
+/* ─── Toasts ──────────────────────────────────────────────────────────────── */
+.bb-toast-container {
+  position: fixed; top: $topbar-height + $ticker-height + $space-md;
+  right: $space-lg; z-index: 9999;
+  display: flex; flex-direction: column; gap: $space-sm;
+  pointer-events: none;
+}
+.bb-toast {
+  display: flex; align-items: center; gap: $space-sm;
+  padding: $space-sm $space-md; background: $bg-secondary;
+  border: 1px solid $border-accent; border-left: 3px solid $accent-orange;
+  font-size: 11px; color: $text-primary; min-width: 260px;
+  animation: slide-in 200ms ease; pointer-events: auto;
+
+  &--alert { border-left-color: $accent-orange; }
+  &--news  { border-left-color: $color-cyan; }
+  &--gain  { border-left-color: $color-gain; }
+  &--loss  { border-left-color: $color-loss; }
+  &--info  { border-left-color: $color-blue; }
+}
+@keyframes slide-in {
+  from { transform: translateX(100%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+.bb-toast__msg   { flex: 1; }
+.bb-toast__close {
+  background: none; border: none; color: $text-muted; cursor: pointer;
+  font-size: 12px; transition: color $transition-fast;
+  &:hover { color: $text-primary; }
+}
+
+/* ─── Global classes ──────────────────────────────────────────────────────── */
+.gain { color: $color-gain; }
+.loss { color: $color-loss; }
+.flat { color: $color-flat; }
+.accent { color: $accent-orange; }
+.mono { @include mono-data; }

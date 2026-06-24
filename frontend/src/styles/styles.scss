@@ -1,0 +1,316 @@
+@use 'variables' as *;
+
+// ─── Google Fonts ─────────────────────────────────────────────────────────────
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Sans+Condensed:wght@400;500;600&display=swap');
+
+// ─── Reset & Base ─────────────────────────────────────────────────────────────
+*, *::before, *::after {
+  box-sizing:  border-box;
+  margin:      0;
+  padding:     0;
+}
+
+html, body {
+  height:           100%;
+  overflow:         hidden;
+}
+
+body {
+  font-family:      $font-sans;
+  font-size:        13px;
+  line-height:      1.5;
+  color:            $text-primary;
+  background:       $bg-primary;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  cursor:           default;
+  user-select:      none;
+}
+
+// ─── Scrollbar ────────────────────────────────────────────────────────────────
+* {
+  @include scrollbar;
+}
+
+// ─── Selection ────────────────────────────────────────────────────────────────
+::selection {
+  background: rgba(255, 149, 0, 0.25);
+  color:      $text-primary;
+}
+
+// ─── Typography ───────────────────────────────────────────────────────────────
+h1, h2, h3, h4 {
+  font-family: $font-display;
+  font-weight: 600;
+  color:       $text-primary;
+}
+
+.mono { @include mono-data; }
+
+// ─── Price Colors ─────────────────────────────────────────────────────────────
+.gain    { color: $color-gain !important; }
+.loss    { color: $color-loss !important; }
+.flat    { color: $color-flat !important; }
+.accent  { color: $accent-orange !important; }
+.cyan    { color: $color-cyan !important; }
+
+// ─── Badges ──────────────────────────────────────────────────────────────────
+.badge-gain { @include badge($color-gain-glow, $color-gain); }
+.badge-loss { @include badge($color-loss-glow, $color-loss); }
+.badge-flat { @include badge(rgba(132,146,166,0.15), $color-flat); }
+.badge-orange { @include badge($accent-orange-glow, $accent-orange); }
+.badge-cyan { @include badge(rgba(0,212,255,0.1), $color-cyan); }
+
+// ─── Panels ──────────────────────────────────────────────────────────────────
+.bb-panel {
+  @include panel;
+
+  &__header {
+    @include panel-header;
+    justify-content: space-between;
+
+    .title { flex: 1; }
+    .actions { display: flex; gap: $space-sm; align-items: center; }
+  }
+
+  &__body {
+    padding: $space-md;
+    overflow: auto;
+    @include scrollbar;
+  }
+}
+
+// ─── Tables ──────────────────────────────────────────────────────────────────
+.bb-table {
+  width:           100%;
+  border-collapse: collapse;
+  font-family:     $font-mono;
+  font-size:       11px;
+
+  th {
+    padding:       5px $space-sm;
+    text-align:    right;
+    font-family:   $font-sans;
+    font-size:     9px;
+    font-weight:   600;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    color:         $text-muted;
+    border-bottom: 1px solid $border-primary;
+    white-space:   nowrap;
+
+    &:first-child { text-align: left; }
+  }
+
+  td {
+    padding:       4px $space-sm;
+    text-align:    right;
+    border-bottom: 1px solid $border-secondary;
+    color:         $text-primary;
+    white-space:   nowrap;
+
+    &:first-child { text-align: left; }
+  }
+
+  tbody tr {
+    transition: background $transition-fast;
+    cursor: pointer;
+
+    &:hover { background: $bg-panel-hover; }
+    &.active { background: rgba(255,149,0,0.06); }
+  }
+
+  &--sm { font-size: 10px; td, th { padding: 3px $space-sm; } }
+}
+
+// ─── Form Controls ────────────────────────────────────────────────────────────
+.bb-input {
+  background:   $bg-input;
+  border:       1px solid $border-primary;
+  border-radius:2px;
+  color:        $text-primary;
+  font-family:  $font-mono;
+  font-size:    12px;
+  padding:      5px 8px;
+  outline:      none;
+  transition:   border-color $transition-fast;
+  width:        100%;
+
+  &:focus {
+    border-color: $accent-orange;
+    @include focus-ring;
+  }
+
+  &::placeholder { color: $text-muted; }
+}
+
+.bb-select {
+  @extend .bb-input;
+  appearance:  none;
+  cursor:      pointer;
+  padding-right:24px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath fill='%238da0bc' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+}
+
+.bb-btn {
+  display:       inline-flex;
+  align-items:   center;
+  gap:           $space-xs;
+  padding:       5px 12px;
+  border:        1px solid $border-primary;
+  border-radius: 2px;
+  background:    $bg-panel;
+  color:         $text-secondary;
+  font-family:   $font-sans;
+  font-size:     11px;
+  font-weight:   600;
+  letter-spacing:0.5px;
+  cursor:        pointer;
+  transition:    all $transition-fast;
+  white-space:   nowrap;
+
+  &:hover {
+    background:   $bg-panel-hover;
+    border-color: $accent-orange-dim;
+    color:        $accent-orange;
+  }
+
+  &--primary {
+    background:   $accent-orange;
+    border-color: $accent-orange;
+    color:        #000;
+
+    &:hover {
+      background:  darken($accent-orange, 10%);
+      color:       #000;
+    }
+  }
+
+  &--danger {
+    &:hover {
+      border-color: $color-loss;
+      color:        $color-loss;
+    }
+  }
+
+  &--sm { padding: 3px 8px; font-size: 10px; }
+  &--icon { padding: 4px 6px; }
+}
+
+// ─── Tabs ─────────────────────────────────────────────────────────────────────
+.bb-tabs {
+  display:        flex;
+  border-bottom:  1px solid $border-primary;
+  gap:            0;
+
+  &__tab {
+    padding:       7px $space-md;
+    font-family:   $font-sans;
+    font-size:     11px;
+    font-weight:   600;
+    letter-spacing:0.8px;
+    text-transform:uppercase;
+    color:         $text-muted;
+    cursor:        pointer;
+    border-bottom: 2px solid transparent;
+    transition:    all $transition-fast;
+    margin-bottom: -1px;
+
+    &:hover { color: $text-secondary; }
+    &.active {
+      color:        $accent-orange;
+      border-color: $accent-orange;
+    }
+  }
+}
+
+// ─── Tooltip ─────────────────────────────────────────────────────────────────
+.bb-tooltip {
+  position:     fixed;
+  background:   $bg-secondary;
+  border:       1px solid $border-accent;
+  border-radius:2px;
+  padding:      $space-sm $space-md;
+  font-family:  $font-mono;
+  font-size:    11px;
+  color:        $text-primary;
+  pointer-events:none;
+  z-index:      9999;
+  box-shadow:   0 4px 20px rgba(0,0,0,0.5);
+  animation:    fade-in 100ms ease;
+}
+
+// ─── Notification Toast ───────────────────────────────────────────────────────
+.bb-toast-container {
+  position:      fixed;
+  top:           $topbar-height + $ticker-height + $space-md;
+  right:         $space-lg;
+  z-index:       9999;
+  display:       flex;
+  flex-direction:column;
+  gap:           $space-sm;
+  pointer-events:none;
+}
+
+.bb-toast {
+  display:       flex;
+  align-items:   flex-start;
+  gap:           $space-sm;
+  padding:       $space-sm $space-md;
+  background:    $bg-secondary;
+  border:        1px solid $border-accent;
+  border-left:   3px solid $accent-orange;
+  border-radius: 2px;
+  min-width:     300px;
+  max-width:     420px;
+  box-shadow:    0 4px 20px rgba(0,0,0,0.4);
+  animation:     slide-in-right 200ms ease;
+  pointer-events:auto;
+  font-size:     12px;
+
+  &--gain   { border-left-color: $color-gain; }
+  &--loss   { border-left-color: $color-loss; }
+  &--news   { border-left-color: $color-cyan; }
+  &--alert  { border-left-color: $accent-orange; }
+}
+
+// ─── Loading States ───────────────────────────────────────────────────────────
+.bb-skeleton {
+  background: linear-gradient(90deg, $bg-secondary 25%, $bg-panel 50%, $bg-secondary 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 2px;
+
+  @keyframes shimmer {
+    from { background-position: 200% 0; }
+    to   { background-position: -200% 0; }
+  }
+}
+
+// ─── WS Status Dot ────────────────────────────────────────────────────────────
+.ws-dot {
+  width:      6px;
+  height:     6px;
+  border-radius:50%;
+  background: $color-flat;
+
+  &.connected {
+    background: $color-gain;
+    animation:  pulse-dot 2s infinite;
+  }
+  &.error { background: $color-loss; }
+}
+
+// ─── Number Flash ─────────────────────────────────────────────────────────────
+.flash-gain { animation: flash-gain 600ms ease; }
+.flash-loss { animation: flash-loss 600ms ease; }
+
+// ─── Responsive ──────────────────────────────────────────────────────────────
+@media (max-width: 1200px) {
+  .hide-md { display: none !important; }
+}
+@media (max-width: 900px) {
+  .hide-sm { display: none !important; }
+}

@@ -1,0 +1,111 @@
+@use '../../../styles/variables' as *;
+
+.dash { display:flex; flex-direction:column; height:100%; overflow:hidden; }
+
+/* ── Banner ─────────────────────────────────────────────────────────────────── */
+.dash-banner {
+  display:flex; align-items:center; height:36px;
+  background:$bg-secondary; border-bottom:$panel-border;
+  padding:0 $space-md; overflow-x:auto; overflow-y:hidden; flex-shrink:0;
+  &::-webkit-scrollbar { height:2px; }
+  &::-webkit-scrollbar-thumb { background:$border-accent; }
+  &__item {
+    display:flex; align-items:center; gap:$space-sm;
+    padding:0 $space-md; border-right:$panel-border;
+    white-space:nowrap; flex-shrink:0; cursor:pointer;
+    transition:background $transition-fast;
+    &:hover { background:$bg-panel-hover; }
+  }
+  &__sym   { @include mono-data; font-size:10px; font-weight:700; color:$accent-orange; letter-spacing:0.5px; }
+  &__price { @include mono-data; font-size:10px; color:$text-primary; }
+  &__divider { width:1px; height:20px; background:$border-accent; margin:0 $space-sm; flex-shrink:0; }
+}
+
+/* ── Grid ───────────────────────────────────────────────────────────────────── */
+.dash-grid {
+  display:grid;
+  grid-template-columns: 1fr 1fr 320px;
+  grid-template-rows:    1fr 230px;
+  grid-template-areas:
+    "movers crypto  heatmap"
+    "news   sectors dominance";
+  flex:1; overflow:hidden;
+}
+
+.dash-panel {
+  overflow:hidden; border-right:$panel-border; border-bottom:$panel-border;
+  display:flex; flex-direction:column;
+  &--movers    { grid-area:movers; }
+  &--crypto    { grid-area:crypto; border-right:none; }
+  &--heatmap   { grid-area:heatmap; border-right:none; }
+  &--news      { grid-area:news; }
+  &--sectors   { grid-area:sectors; }
+  &--dominance { grid-area:dominance; border-right:none; border-bottom:none; }
+}
+
+/* ── Movers tabs ─────────────────────────────────────────────────────────────── */
+.mover-tabs { display:flex; gap:0; }
+.mover-tab {
+  padding:2px 8px; font-size:9px; font-weight:700; letter-spacing:0.8px;
+  color:$text-muted; cursor:pointer; border-bottom:2px solid transparent;
+  transition:all $transition-fast; text-transform:uppercase;
+  &:hover { color:$text-secondary; }
+  &.active { color:$accent-orange; border-bottom-color:$accent-orange; }
+}
+
+/* ── Heatmap ─────────────────────────────────────────────────────────────────── */
+.heatmap-body {
+  display:flex; flex-wrap:wrap; gap:2px;
+  align-content:flex-start; padding:$space-sm; overflow:hidden; flex:1;
+}
+.heatmap-cell {
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  min-height:38px; border-radius:2px; cursor:pointer;
+  padding:3px 2px; transition:filter $transition-fast;
+  flex-grow:1; min-width:42px; overflow:hidden;
+  &:hover { filter:brightness(1.2); }
+}
+.heatmap-sym { @include mono-data; font-size:9px; font-weight:700; color:rgba(255,255,255,0.95); }
+.heatmap-pct { @include mono-data; font-size:8px; color:rgba(255,255,255,0.75); }
+.heatmap-legend { display:flex; align-items:center; gap:$space-sm; }
+.heatmap-legend-bar { width:72px; height:5px; border-radius:2px; background:linear-gradient(to right,#cc1f3f,#1a2840,#009f5c); }
+
+/* ── News ─────────────────────────────────────────────────────────────────────── */
+.dash-news-item {
+  display:block; padding:$space-sm $space-md;
+  border-bottom:$panel-border; text-decoration:none; transition:background $transition-fast;
+  &:hover { background:$bg-panel-hover; }
+}
+.dash-news-meta { display:flex; align-items:center; gap:$space-sm; margin-bottom:3px; }
+.dash-news-src  { font-size:9px; font-weight:700; letter-spacing:1px; color:$accent-orange; text-transform:uppercase; }
+.dash-news-cat  { font-size:9px; color:$text-muted; }
+.dash-news-time { @include mono-data; font-size:9px; color:$text-muted; margin-left:auto; }
+.dash-news-hl   { font-size:11px; color:$text-primary; line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+
+/* ── Sectors ──────────────────────────────────────────────────────────────────── */
+.sector-row { display:flex; align-items:center; gap:$space-sm; padding:5px $space-md; border-bottom:$panel-border; }
+.sector-name { font-size:10px; color:$text-secondary; min-width:120px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.sector-bar-wrap { flex:1; height:8px; background:$bg-secondary; border-radius:2px; overflow:hidden; }
+.sector-bar { height:100%; border-radius:2px; transition:width 500ms ease; min-width:2px; }
+.gain-bar { background:rgba(0,217,126,0.5); } .loss-bar { background:rgba(255,51,85,0.5); }
+.sector-pct { @include mono-data; font-size:10px; min-width:52px; text-align:right; }
+
+/* ── Dominance ────────────────────────────────────────────────────────────────── */
+.dom-legend { display:flex; flex-direction:column; gap:$space-xs; padding:$space-sm 0; width:100%; }
+.dom-item { display:flex; align-items:center; gap:$space-sm; font-size:11px; color:$text-secondary; justify-content:space-between; }
+.dom-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.dom-stats { width:100%; border-top:$panel-border; padding-top:$space-sm; }
+.dom-stat { display:flex; justify-content:space-between; padding:3px 0; font-size:10px; color:$text-muted; border-bottom:1px solid $border-secondary; }
+
+.gain { color:$color-gain; } .loss { color:$color-loss; } .accent { color:$accent-orange; }
+.mono { @include mono-data; }
+.hide-sm { @media(max-width:1100px){display:none;} }
+
+@media(max-width:1200px) {
+  .dash-grid {
+    grid-template-columns:1fr 1fr;
+    grid-template-rows:auto auto auto;
+    grid-template-areas:"movers crypto" "heatmap heatmap" "news sectors";
+  }
+  .dash-panel--dominance{display:none;}
+}

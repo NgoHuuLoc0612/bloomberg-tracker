@@ -1,0 +1,175 @@
+@use '../../../styles/variables' as *;
+
+.crypto-shell {
+  display:        flex;
+  flex-direction: column;
+  height:         100%;
+  overflow:       hidden;
+}
+
+.crypto-global {
+  display:        flex;
+  align-items:    center;
+  padding:        0 $space-md;
+  height:         36px;
+  background:     $bg-secondary;
+  border-bottom:  $panel-border;
+  flex-shrink:    0;
+  gap:            0;
+  overflow-x:     auto;
+  @include scrollbar;
+}
+
+.cglo-stat {
+  display:        flex;
+  align-items:    center;
+  gap:            $space-sm;
+  padding:        0 $space-lg;
+  border-right:   $panel-border;
+  font-size:      11px;
+  white-space:    nowrap;
+
+  span:first-child { color: $text-muted; font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+}
+
+.crypto-body {
+  display: flex;
+  flex:    1;
+  overflow: hidden;
+}
+
+.crypto-left {
+  flex:           1;
+  display:        flex;
+  flex-direction: column;
+  overflow:       hidden;
+}
+
+.crypto-filters {
+  display:        flex;
+  align-items:    center;
+  gap:            $space-sm;
+  padding:        $space-sm $space-md;
+  border-bottom:  $panel-border;
+  flex-shrink:    0;
+}
+
+.crypto-table-wrap {
+  flex:       1;
+  overflow-y: auto;
+  @include scrollbar;
+}
+
+.crypto-right {
+  width:        320px;
+  background:   $bg-panel;
+  border-left:  $panel-border;
+  flex-shrink:  0;
+  overflow-y:   auto;
+  @include scrollbar;
+}
+
+.coin-empty {
+  display:        flex;
+  flex-direction: column;
+  align-items:    center;
+  justify-content:center;
+  height:         100%;
+  gap:            $space-md;
+  color:          $text-muted;
+  font-size:      32px;
+}
+
+.coin-detail { padding: $space-md; }
+
+.coin-header {
+  display:        flex;
+  align-items:    center;
+  gap:            $space-md;
+  padding-bottom: $space-md;
+  border-bottom:  $panel-border;
+  margin-bottom:  $space-md;
+
+  &__name { font-size: 14px; font-weight: 600; color: $text-primary; }
+  &__sym  { font-size: 11px; margin-top: 2px; }
+}
+
+.coin-ohlc {
+  display:              grid;
+  grid-template-columns:1fr 1fr;
+  gap:                  1px;
+  background:           $border-primary;
+  border:               $panel-border;
+  border-radius:        2px;
+  overflow:             hidden;
+  margin-bottom:        $space-md;
+
+  &__item {
+    display:        flex;
+    flex-direction: column;
+    gap:            3px;
+    padding:        $space-sm $space-md;
+    background:     $bg-panel;
+
+    span:first-child {
+      font-size:    8px;
+      font-weight:  700;
+      letter-spacing:1px;
+      color:        $text-muted;
+      text-transform:uppercase;
+    }
+
+    span:last-child { font-size: 11px; color: $text-primary; }
+  }
+}
+
+.order-book {
+  border:       $panel-border;
+  border-radius:2px;
+  overflow:     hidden;
+}
+
+.ob-body { }
+
+.ob-side {}
+
+.ob-header {
+  display:      grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  padding:      4px $space-sm;
+  font-size:    8px;
+  font-weight:  700;
+  letter-spacing:1px;
+  color:        $text-muted;
+  text-transform:uppercase;
+  border-bottom:$panel-border;
+}
+
+.ob-row {
+  display:      grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  padding:      3px $space-sm;
+  font-size:    10px;
+  border-bottom:1px solid $border-secondary;
+  transition:   background $transition-fast;
+  position:     relative;
+
+  &:hover { filter: brightness(1.15); }
+  span { text-align: right; }
+}
+
+.ob-spread {
+  text-align:   center;
+  font-size:    9px;
+  color:        $text-muted;
+  padding:      4px;
+  border-top:   $panel-border;
+  border-bottom:$panel-border;
+  background:   $bg-secondary;
+  font-family:  $font-mono;
+}
+
+.gain   { color: $color-gain; }
+.loss   { color: $color-loss; }
+.accent { color: $accent-orange; }
+.mono   { font-family: $font-mono; font-feature-settings: 'tnum'; }

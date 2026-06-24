@@ -1,0 +1,182 @@
+// ═════════════════════════════════════════════════════════════════════════════
+// BLOOMBERG TERMINAL DESIGN SYSTEM
+// ═════════════════════════════════════════════════════════════════════════════
+
+// ─── Color Palette ───────────────────────────────────────────────────────────
+$bg-primary:      #060a14;
+$bg-secondary:    #0c1322;
+$bg-tertiary:     #101829;
+$bg-panel:        #0d1526;
+$bg-panel-hover:  #131d30;
+$bg-input:        #0a1220;
+$bg-overlay:      rgba(6, 10, 20, 0.92);
+
+$border-primary:  #1a2840;
+$border-secondary:#0f1e33;
+$border-accent:   #1e3555;
+
+// Bloomberg signature orange
+$accent-orange:   #ff9500;
+$accent-orange-dim:#c47300;
+$accent-orange-glow:rgba(255, 149, 0, 0.15);
+
+// Data colors
+$color-cyan:      #00d4ff;
+$color-cyan-dim:  #0099bb;
+$color-blue:      #3b82f6;
+$color-blue-dim:  #1d4ed8;
+$color-purple:    #8b5cf6;
+
+// Market colors
+$color-gain:      #00d97e;
+$color-gain-dim:  #009f5c;
+$color-gain-glow: rgba(0, 217, 126, 0.15);
+$color-loss:      #ff3355;
+$color-loss-dim:  #cc1f3f;
+$color-loss-glow: rgba(255, 51, 85, 0.15);
+$color-flat:      #8492a6;
+
+// Text
+$text-primary:    #d4e0f5;
+$text-secondary:  #8da0bc;
+$text-muted:      #4a5e7a;
+$text-accent:     $accent-orange;
+$text-cyan:       $color-cyan;
+
+// ─── Typography ──────────────────────────────────────────────────────────────
+$font-mono:       'IBM Plex Mono', 'JetBrains Mono', 'Cascadia Code', 'Courier New', monospace;
+$font-sans:       'IBM Plex Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+$font-display:    'IBM Plex Sans Condensed', $font-sans;
+
+// ─── Spacing ─────────────────────────────────────────────────────────────────
+$space-xs:  4px;
+$space-sm:  8px;
+$space-md:  12px;
+$space-lg:  16px;
+$space-xl:  24px;
+$space-2xl: 32px;
+$space-3xl: 48px;
+
+// ─── Layout ──────────────────────────────────────────────────────────────────
+$topbar-height:   40px;
+$ticker-height:   28px;
+$sidebar-width:   240px;
+$sidebar-collapsed:56px;
+$panel-border:    1px solid $border-primary;
+
+// ─── Transitions ─────────────────────────────────────────────────────────────
+$transition-fast:   100ms ease;
+$transition-normal: 200ms ease;
+$transition-slow:   350ms cubic-bezier(0.4, 0, 0.2, 1);
+
+// ─── Mixins ──────────────────────────────────────────────────────────────────
+@mixin panel {
+  background:   $bg-panel;
+  border:       $panel-border;
+  border-radius:2px;
+}
+
+@mixin panel-header {
+  display:      flex;
+  align-items:  center;
+  padding:      0 $space-md;
+  height:       32px;
+  background:   $bg-secondary;
+  border-bottom:$panel-border;
+  font-family:  $font-sans;
+  font-size:    10px;
+  font-weight:  600;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+  color:        $text-muted;
+}
+
+@mixin mono-data {
+  font-family: $font-mono;
+  font-feature-settings: 'tnum';
+  font-variant-numeric: tabular-nums;
+}
+
+@mixin gain-color { color: $color-gain; }
+@mixin loss-color { color: $color-loss; }
+@mixin flat-color { color: $color-flat; }
+
+@mixin gain-bg {
+  background: $color-gain-glow;
+  color:      $color-gain;
+}
+
+@mixin loss-bg {
+  background: $color-loss-glow;
+  color:      $color-loss;
+}
+
+@mixin glow-orange {
+  box-shadow: 0 0 12px $accent-orange-glow, 0 0 4px rgba(255, 149, 0, 0.3);
+}
+
+@mixin scrollbar {
+  &::-webkit-scrollbar        { width: 4px; height: 4px; }
+  &::-webkit-scrollbar-track  { background: $bg-secondary; }
+  &::-webkit-scrollbar-thumb  { background: $border-accent; border-radius: 2px; }
+  &::-webkit-scrollbar-thumb:hover { background: $accent-orange-dim; }
+}
+
+@mixin focus-ring {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 149, 0, 0.4);
+}
+
+@mixin badge($bg, $color) {
+  display:       inline-flex;
+  align-items:   center;
+  padding:       2px 6px;
+  border-radius: 2px;
+  font-family:   $font-mono;
+  font-size:     10px;
+  font-weight:   600;
+  background:    $bg;
+  color:         $color;
+  white-space:   nowrap;
+}
+
+// ─── Animations ──────────────────────────────────────────────────────────────
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+@keyframes flash-gain {
+  0%, 100% { background: transparent; }
+  30%       { background: $color-gain-glow; }
+}
+
+@keyframes flash-loss {
+  0%, 100% { background: transparent; }
+  30%       { background: $color-loss-glow; }
+}
+
+@keyframes ticker-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+@keyframes slide-in-right {
+  from { transform: translateX(100%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { transform: scale(1);   opacity: 1; }
+  50%       { transform: scale(1.4); opacity: 0.7; }
+}
+
+@keyframes scan-line {
+  from { top: 0; }
+  to   { top: 100%; }
+}
